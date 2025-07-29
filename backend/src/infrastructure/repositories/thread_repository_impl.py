@@ -42,12 +42,14 @@ class ThreadRepositoryImpl(ThreadRepository):
 
     async def get_all_threads(self) -> List[Thread]:
         result = await self._session.execute(
-            select(ThreadModel)
-            .order_by(ThreadModel.updated_at.desc())
+            select(ThreadModel).order_by(ThreadModel.updated_at.desc())
         )
         thread_models = result.scalars().all()
 
-        return [self._model_to_entity(model, include_messages=False) for model in thread_models]
+        return [
+            self._model_to_entity(model, include_messages=False)
+            for model in thread_models
+        ]
 
     async def update_thread(self, thread: Thread) -> Thread:
         result = await self._session.execute(
@@ -76,13 +78,15 @@ class ThreadRepositoryImpl(ThreadRepository):
         await self._session.commit()
         return True
 
-    def _model_to_entity(self, model: ThreadModel, include_messages: bool = False) -> Thread:
+    def _model_to_entity(
+        self, model: ThreadModel, include_messages: bool = False
+    ) -> Thread:
         from uuid import UUID
 
         messages = []
-        if include_messages and hasattr(model, '_sa_instance_state'):
+        if include_messages and hasattr(model, "_sa_instance_state"):
             # Only access messages if they were explicitly loaded
-            if 'messages' in model.__dict__:
+            if "messages" in model.__dict__:
                 messages = [
                     Message(
                         id=UUID(msg.id),

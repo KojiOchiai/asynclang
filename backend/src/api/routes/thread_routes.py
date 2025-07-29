@@ -18,7 +18,9 @@ from ...infrastructure.repositories import MessageRepositoryImpl, ThreadReposito
 router = APIRouter(prefix="/threads", tags=["threads"])
 
 
-async def get_thread_service(session: Annotated[AsyncSession, Depends(get_async_session)]) -> ThreadService:
+async def get_thread_service(
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+) -> ThreadService:
     thread_repository = ThreadRepositoryImpl(session)
     message_repository = MessageRepositoryImpl(session)
     return ThreadService(thread_repository, message_repository)
