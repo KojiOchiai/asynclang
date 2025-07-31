@@ -1,8 +1,9 @@
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, String, Text
+from sqlalchemy import DateTime, Enum, ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from ...domain.value_objects.message_role import MessageRole
 from .database import Base
 
 
@@ -26,7 +27,7 @@ class MessageModel(Base):
     thread_id: Mapped[str] = mapped_column(
         String(36), ForeignKey("threads.id"), nullable=False
     )
-    role: Mapped[str] = mapped_column(String(50), nullable=False)
+    role: Mapped[MessageRole] = mapped_column(Enum(MessageRole), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     parent_id: Mapped[str] = mapped_column(

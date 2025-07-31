@@ -3,6 +3,8 @@ from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
 
+from ..value_objects.message_role import MessageRole
+
 
 @dataclass
 class Thread:
@@ -23,7 +25,7 @@ class Thread:
 class Message:
     id: UUID
     thread_id: UUID
-    role: str  # "user" or "assistant"
+    role: MessageRole
     content: str
     created_at: datetime
     parent_id: Optional[UUID] = None  # Parent message ID for tree structure

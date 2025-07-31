@@ -4,11 +4,13 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
+from ...domain.value_objects.message_role import MessageRole
+
 
 class MessageDto(BaseModel):
     id: UUID
     thread_id: UUID
-    role: str
+    role: MessageRole
     content: str
     created_at: datetime
     parent_id: Optional[UUID] = None
@@ -33,7 +35,7 @@ class CreateThreadRequest(BaseModel):
 
 
 class CreateMessageRequest(BaseModel):
-    role: str
+    role: MessageRole
     content: str
     parent_id: Optional[UUID] = None
 
