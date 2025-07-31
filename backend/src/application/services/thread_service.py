@@ -63,7 +63,7 @@ class ThreadService:
             raise ValueError(f"Thread with id {thread_id} not found")
 
         message_id = uuid4()
-        now = datetime.utcnow()
+        now = datetime.now()
 
         message = Message(
             id=message_id,
