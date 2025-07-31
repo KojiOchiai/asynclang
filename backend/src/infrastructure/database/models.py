@@ -29,6 +29,9 @@ class MessageModel(Base):
     role: Mapped[str] = mapped_column(String(50), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    parent_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("messages.id"), nullable=True
+    )
 
     thread: Mapped["ThreadModel"] = relationship(
         "ThreadModel", back_populates="messages"

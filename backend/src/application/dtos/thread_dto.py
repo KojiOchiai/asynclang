@@ -11,6 +11,7 @@ class MessageDto(BaseModel):
     role: str
     content: str
     created_at: datetime
+    parent_id: Optional[UUID] = None
 
     class Config:
         from_attributes = True
@@ -34,6 +35,7 @@ class CreateThreadRequest(BaseModel):
 class CreateMessageRequest(BaseModel):
     role: str
     content: str
+    parent_id: Optional[UUID] = None
 
 
 class ThreadListResponse(BaseModel):

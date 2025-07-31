@@ -94,6 +94,7 @@ class ThreadRepositoryImpl(ThreadRepository):
                         role=msg.role,
                         content=msg.content,
                         created_at=msg.created_at,
+                        parent_id=UUID(msg.parent_id) if msg.parent_id else None,
                     )
                     for msg in model.messages
                 ]
@@ -118,6 +119,7 @@ class MessageRepositoryImpl(MessageRepository):
             role=message.role,
             content=message.content,
             created_at=message.created_at,
+            parent_id=str(message.parent_id) if message.parent_id else None,
         )
         self._session.add(message_model)
         await self._session.commit()
@@ -155,4 +157,5 @@ class MessageRepositoryImpl(MessageRepository):
             role=model.role,
             content=model.content,
             created_at=model.created_at,
+            parent_id=UUID(model.parent_id) if model.parent_id else None,
         )

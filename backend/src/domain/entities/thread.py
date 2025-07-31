@@ -26,3 +26,4 @@ class Message:
     role: str  # "user" or "assistant"
     content: str
     created_at: datetime
+    parent_id: Optional[UUID] = None  # Parent message ID for tree structure

@@ -71,6 +71,7 @@ class ThreadService:
             role=request.role,
             content=request.content,
             created_at=now,
+            parent_id=request.parent_id,
         )
 
         created_message = await self._message_repository.create_message(message)
