@@ -18,7 +18,7 @@ class Thread:
         if self.messages is None:
             self.messages = []
         self.messages.append(message)
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now()
 
 
 @dataclass

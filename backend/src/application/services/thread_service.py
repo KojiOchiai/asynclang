@@ -25,7 +25,7 @@ class ThreadService:
 
     async def create_thread(self, request: CreateThreadRequest) -> ThreadDto:
         thread_id = uuid4()
-        now = datetime.utcnow()
+        now = datetime.now()
 
         thread = Thread(
             id=thread_id,
