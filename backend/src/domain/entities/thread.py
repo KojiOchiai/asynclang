@@ -25,6 +25,30 @@ class Thread:
         self.messages.append(message)
         self.updated_at = datetime.now()
 
+    def get_last_message_path(self) -> List["Message"]:
+        """Get the path to the last message following parent-child relationships."""
+        if not self.messages:
+            return []
+
+        # Find the message with the latest created_at timestamp
+        last_message = max(self.messages, key=lambda msg: msg.created_at)
+
+        # Build path from root to last message
+        path: list[Message] = []
+        current: Message | None = last_message
+
+        # Trace back to root following parent_id chain
+        while current is not None:
+            path.insert(0, current)  # Insert at beginning to build path from root
+            if current.parent_id is None:
+                break
+            # Find parent message
+            current = next(
+                (msg for msg in self.messages if msg.id == current.parent_id), None
+            )
+
+        return path
+
 
 @dataclass
 class Message:
