@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 
 from ...domain.value_objects.message_role import MessageRole
 
@@ -31,13 +31,29 @@ class ThreadDto(BaseModel):
 
 
 class CreateThreadRequest(BaseModel):
-    title: str
+    title: str = Field(min_length=1, max_length=200)
+
+    @field_validator("title")
+    @classmethod
+    def validate_title(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Title cannot be empty or only whitespace")
+        return v
 
 
 class CreateMessageRequest(BaseModel):
     role: MessageRole
-    content: str
+    content: str = Field(min_length=1, max_length=8000)
     parent_id: Optional[UUID] = None
+
+    @field_validator("content")
+    @classmethod
+    def validate_content(cls, v: str) -> str:
+        v = v.strip()
+        if not v:
+            raise ValueError("Content cannot be empty or only whitespace")
+        return v
 
 
 class ThreadListResponse(BaseModel):
