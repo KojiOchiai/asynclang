@@ -1,3 +1,26 @@
-from .thread import Message, Thread
+from .message_parts import (
+    RequestPart,
+    ResponsePart,
+    SystemPromptPart,
+    TextPart,
+    ThinkingPart,
+    ToolCallPart,
+    ToolReturnPart,
+    UserPromptPart,
+)
+from .thread import Message, MessageRequest, MessageResponse, Thread
 
-__all__ = ["Thread", "Message"]
+__all__ = [
+    "Message",
+    "MessageRequest",
+    "MessageResponse",
+    "Thread",
+    "RequestPart",
+    "ResponsePart",
+    "SystemPromptPart",
+    "UserPromptPart",
+    "TextPart",
+    "ToolCallPart",
+    "ToolReturnPart",
+    "ThinkingPart",
+]
