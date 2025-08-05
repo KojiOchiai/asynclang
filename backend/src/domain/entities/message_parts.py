@@ -6,7 +6,6 @@ from uuid import UUID
 
 # Import specific PydanticAI types
 from pydantic_ai.messages import TextPart as PydanticTextPart
-from pydantic_ai.messages import ThinkingPart as PydanticThinkingPart
 from pydantic_ai.messages import ToolCallPart as PydanticToolCallPart
 from pydantic_ai.messages import ToolReturnPart as PydanticToolReturnPart
 from pydantic_ai.messages import UserPromptPart as PydanticUserPromptPart
@@ -92,14 +91,3 @@ class ToolReturnPart(ResponsePart):
             content=self.content,
             tool_call_id=self.tool_call_id,
         )
-
-
-@dataclass
-class ThinkingPart(ResponsePart):
-    """Model's thinking process part."""
-
-    content: str
-
-    def to_pydantic_ai_part(self) -> PydanticThinkingPart:
-        """Convert to PydanticAI ThinkingPart."""
-        return PydanticThinkingPart(content=self.content)

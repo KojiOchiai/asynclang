@@ -1,11 +1,11 @@
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Union
 from uuid import UUID
 
-from pydantic_ai.messages import ModelRequest, ModelResponse, SystemPromptPart, Usage
+from pydantic_ai.messages import ModelRequest, ModelResponse, Usage
 
-from .message_parts import RequestPart, ResponsePart
+from .message_parts import TextPart, ToolCallPart, ToolReturnPart, UserPromptPart
 
 
 @dataclass
@@ -16,30 +16,23 @@ class Thread:
     title: str
     created_at: datetime
     updated_at: datetime
-    prompt: str
-    messages: Optional[List["Message"]] = None
+    messages: List[Union["MessageRequest", "MessageResponse"]] = field(
+        default_factory=list
+    )
 
-    def add_message(self, message: "Message") -> None:
+    def add_message(self, message: Union["MessageRequest", "MessageResponse"]) -> None:
         """Add a message to the thread."""
         if self.messages is None:
             self.messages = []
         self.messages.append(message)
         self.updated_at = datetime.now()
 
-    def to_pydantic_ai_prompt(self) -> SystemPromptPart:
-        """Convert thread prompt to PydanticAI SystemPromptPart."""
-        return SystemPromptPart(content=self.prompt)
-
     def to_pydantic_ai_thread(self) -> list[ModelRequest | ModelResponse]:
         """Convert thread messages to PydanticAI format."""
-        prompt_part = self.to_pydantic_ai_prompt()
-        prompt = ModelRequest(
-            parts=[prompt_part],
-        )
         if not self.messages:
-            return [prompt]
+            return []
 
-        pydantic_messages: list[ModelRequest | ModelResponse] = [prompt]
+        pydantic_messages: list[ModelRequest | ModelResponse] = []
         for message in self.messages:
             if isinstance(message, MessageRequest):
                 pydantic_messages.append(message.to_pydantic_ai_model_request())
@@ -48,7 +41,7 @@ class Thread:
 
         return pydantic_messages
 
-    def get_last_message_path(self) -> List["Message"]:
+    def get_last_message_path(self) -> list[Union["MessageRequest", "MessageResponse"]]:
         """Get the path to the last message following parent-child relationships."""
         if not self.messages:
             return []
@@ -57,8 +50,8 @@ class Thread:
         last_message = max(self.messages, key=lambda msg: msg.created_at)
 
         # Build path from root to last message
-        path: list[Message] = []
-        current: Message | None = last_message
+        path: list[MessageRequest | MessageResponse] = []
+        current: MessageRequest | MessageResponse | None = last_message
 
         # Trace back to root following parent_id chain
         while current is not None:
@@ -88,13 +81,13 @@ class MessageRequest(Message):
     """Message request entity (ModelRequest in PydanticAI)."""
 
     instructions: Optional[str] = None
-    parts: List[RequestPart] = field(default_factory=list)
+    parts: list[UserPromptPart] = field(default_factory=list)
 
     def to_pydantic_ai_model_request(self) -> ModelRequest:
         """Convert to PydanticAI ModelRequest."""
 
         # Convert all parts to PydanticAI format
-        pydantic_parts = [part.to_pydantic_ai_part() for part in self.parts]
+        pydantic_parts: list = [part.to_pydantic_ai_part() for part in self.parts]
 
         return ModelRequest(
             parts=pydantic_parts, instructions=self.instructions, kind="request"
@@ -109,13 +102,13 @@ class MessageResponse(Message):
     timestamp: datetime = field(default_factory=datetime.now)
     usage_tokens: Optional[int] = None
     vendor_details: Optional[dict] = None
-    parts: List[ResponsePart] = field(default_factory=list)
+    parts: list[ToolReturnPart | TextPart | ToolCallPart] = field(default_factory=list)
 
     def to_pydantic_ai_model_response(self) -> ModelResponse:
         """Convert to PydanticAI ModelResponse."""
 
         # Convert all parts to PydanticAI format
-        pydantic_parts = [part.to_pydantic_ai_part() for part in self.parts]
+        pydantic_parts: list = [part.to_pydantic_ai_part() for part in self.parts]
 
         # Create usage object if token count is available
         usage = Usage(

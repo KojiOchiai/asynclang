@@ -5,7 +5,11 @@ from pydantic_ai import Agent
 from pydantic_ai.mcp import MCPServerStreamableHTTP
 
 server = MCPServerStreamableHTTP("http://localhost:8000/mcp")
-agent = Agent("openai:gpt-4o", toolsets=[server])
+agent = Agent(
+    "openai:gpt-4o",
+    system_prompt="You are a helpful assistant. Return message with ! mark.",
+    toolsets=[server],
+)
 
 
 async def main():

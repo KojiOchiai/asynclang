@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from typing import List, Union
 
 from ..entities.thread import MessageRequest, MessageResponse
 
@@ -9,7 +8,7 @@ class LLMService(ABC):
 
     @abstractmethod
     async def generate_assistant_response(
-        self, messages: List[Union[MessageRequest, MessageResponse]]
+        self, messages: list[MessageRequest | MessageResponse]
     ) -> MessageResponse:
         """
         Generate an assistant response based on conversation history.
