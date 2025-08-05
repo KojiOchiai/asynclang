@@ -5,7 +5,6 @@ from typing import Any, Optional
 from uuid import UUID
 
 # Import specific PydanticAI types
-from pydantic_ai.messages import SystemPromptPart as PydanticSystemPromptPart
 from pydantic_ai.messages import TextPart as PydanticTextPart
 from pydantic_ai.messages import ThinkingPart as PydanticThinkingPart
 from pydantic_ai.messages import ToolCallPart as PydanticToolCallPart
@@ -29,21 +28,8 @@ class RequestPart(ABC):
 
 
 @dataclass
-class SystemPromptPart(RequestPart):
-    """System prompt part for model requests."""
-
-    dynamic_ref: Optional[str] = None
-
-    def to_pydantic_ai_part(self) -> PydanticSystemPromptPart:
-        """Convert to PydanticAI SystemPromptPart."""
-        return PydanticSystemPromptPart(content=self.content)
-
-
-@dataclass
 class UserPromptPart(RequestPart):
     """User prompt part for model requests."""
-
-    metadata: Optional[dict] = None
 
     def to_pydantic_ai_part(self) -> PydanticUserPromptPart:
         """Convert to PydanticAI UserPromptPart."""

@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import List, Optional
 from uuid import UUID
 
-from pydantic_ai.messages import ModelRequest, ModelResponse, Usage
+from pydantic_ai.messages import ModelRequest, ModelResponse, SystemPromptPart, Usage
 
 from .message_parts import RequestPart, ResponsePart
 
@@ -16,6 +16,7 @@ class Thread:
     title: str
     created_at: datetime
     updated_at: datetime
+    prompt: str
     messages: Optional[List["Message"]] = None
 
     def add_message(self, message: "Message") -> None:
@@ -24,6 +25,28 @@ class Thread:
             self.messages = []
         self.messages.append(message)
         self.updated_at = datetime.now()
+
+    def to_pydantic_ai_prompt(self) -> SystemPromptPart:
+        """Convert thread prompt to PydanticAI SystemPromptPart."""
+        return SystemPromptPart(content=self.prompt)
+
+    def to_pydantic_ai_thread(self) -> list[ModelRequest | ModelResponse]:
+        """Convert thread messages to PydanticAI format."""
+        prompt_part = self.to_pydantic_ai_prompt()
+        prompt = ModelRequest(
+            parts=[prompt_part],
+        )
+        if not self.messages:
+            return [prompt]
+
+        pydantic_messages: list[ModelRequest | ModelResponse] = [prompt]
+        for message in self.messages:
+            if isinstance(message, MessageRequest):
+                pydantic_messages.append(message.to_pydantic_ai_model_request())
+            elif isinstance(message, MessageResponse):
+                pydantic_messages.append(message.to_pydantic_ai_model_response())
+
+        return pydantic_messages
 
     def get_last_message_path(self) -> List["Message"]:
         """Get the path to the last message following parent-child relationships."""
