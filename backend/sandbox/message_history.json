@@ -1,0 +1,87 @@
+[
+  {
+    "parts": [
+      {
+        "content": "You are a helpful assistant. Return message with three ! marks.",
+        "timestamp": "2025-08-06T07:19:00.565368Z",
+        "dynamic_ref": null,
+        "part_kind": "system-prompt"
+      },
+      {
+        "content": "I am Alice. What time is it?",
+        "timestamp": "2025-08-06T07:19:00.565371Z",
+        "part_kind": "user-prompt"
+      }
+    ],
+    "instructions": null,
+    "kind": "request"
+  },
+  {
+    "parts": [
+      {
+        "tool_name": "get_time",
+        "args": "{}",
+        "tool_call_id": "call_zfABLeP1SsYoXsY8q4GxDCsZ",
+        "part_kind": "tool-call"
+      }
+    ],
+    "usage": {
+      "requests": 1,
+      "request_tokens": 58,
+      "response_tokens": 10,
+      "total_tokens": 68,
+      "details": {
+        "accepted_prediction_tokens": 0,
+        "audio_tokens": 0,
+        "reasoning_tokens": 0,
+        "rejected_prediction_tokens": 0,
+        "cached_tokens": 0
+      }
+    },
+    "model_name": "gpt-4o-2024-08-06",
+    "timestamp": "2025-08-06T07:19:01Z",
+    "kind": "response",
+    "vendor_details": null,
+    "vendor_id": "chatcmpl-C1SiLBjsBlLCsPeosGKswRyLzzZJI"
+  },
+  {
+    "parts": [
+      {
+        "tool_name": "get_time",
+        "content": "2025-08-06 16:19:01",
+        "tool_call_id": "call_zfABLeP1SsYoXsY8q4GxDCsZ",
+        "metadata": null,
+        "timestamp": "2025-08-06T07:19:01.610006Z",
+        "part_kind": "tool-return"
+      }
+    ],
+    "instructions": null,
+    "kind": "request"
+  },
+  {
+    "parts": [
+      {
+        "content": "Hello Alice! The current time is 16:19 on August 6, 2025!!!",
+        "part_kind": "text"
+      }
+    ],
+    "usage": {
+      "requests": 1,
+      "request_tokens": 88,
+      "response_tokens": 21,
+      "total_tokens": 109,
+      "details": {
+        "accepted_prediction_tokens": 0,
+        "audio_tokens": 0,
+        "reasoning_tokens": 0,
+        "rejected_prediction_tokens": 0,
+        "cached_tokens": 0
+      }
+    },
+    "model_name": "gpt-4o-2024-08-06",
+    "timestamp": "2025-08-06T07:19:01Z",
+    "kind": "response",
+    "vendor_details": null,
+    "vendor_id": "chatcmpl-C1SiLAKI67gnTZlOK63wCJg6CXcaR"
+  }
+]
