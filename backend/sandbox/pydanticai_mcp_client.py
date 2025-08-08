@@ -14,8 +14,10 @@ agent = Agent(
 
 
 async def main():
-    async with agent:
-        result = await agent.run("I am Alice. What time is it?")
+    async with agent.run_stream("I am Alice. What time is it?") as result:
+        async for message in result.stream_text():
+            print(f"\r{message}", end="", flush=True)
+    print("")
 
     # Save the message history to a file
     history_bytes = ModelMessagesTypeAdapter.dump_json(result.all_messages(), indent=2)
@@ -26,8 +28,10 @@ async def main():
     history = ModelMessagesTypeAdapter.validate_json(row)
 
     # Run the agent with the loaded message history
-    async with agent:
-        result = await agent.run("Who am I?", message_history=history)
+    async with agent.run_stream("Who am I", message_history=history) as result:
+        async for message in result.stream_text():
+            print(f"\r{message}", end="", flush=True)
+    print("")
 
     # Print the results
     for message in result.all_messages():
