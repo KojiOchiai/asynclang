@@ -4,6 +4,7 @@ from pathlib import Path
 from pydantic_ai import Agent
 from pydantic_ai.mcp import MCPServerStreamableHTTP
 from pydantic_ai.messages import ModelMessagesTypeAdapter
+from pydantic_ai.models.openai import OpenAIResponsesModel, OpenAIResponsesModelSettings
 
 server = MCPServerStreamableHTTP("http://localhost:8000/mcp")
 agent = Agent(
@@ -12,15 +13,27 @@ agent = Agent(
     toolsets=[server],
 )
 
+model = OpenAIResponsesModel("o3")
+settings = OpenAIResponsesModelSettings(
+    openai_reasoning_effort="low", openai_reasoning_summary="detailed"
+)
+agent = Agent(model, model_settings=settings, toolsets=[server])
 
-async def main():
-    message_count = 0
-    async with agent.run_stream("I am Alice. What time is it?") as result:
-        print(result.all_messages()[message_count + 1 :])
+
+async def run_agent(agent: Agent, prompt: str, message_history: list):
+    message_count = len(message_history)
+    async with agent.run_stream(prompt, message_history=message_history) as result:
+        for tool_message in result.all_messages()[message_count + 1 :]:
+            print(tool_message)
         async for message in result.stream_text():
             print(f"\r{message}", end="", flush=True)
     message_count = len(result.all_messages())
     print("")
+    return result
+
+
+async def main():
+    result = await run_agent(agent, "I am Alice. What time is it?", [])
 
     # Save the message history to a file
     history_bytes = ModelMessagesTypeAdapter.dump_json(result.all_messages(), indent=2)
@@ -31,12 +44,7 @@ async def main():
     history = ModelMessagesTypeAdapter.validate_json(row)
 
     # Run the agent with the loaded message history
-    async with agent.run_stream("Who am I", message_history=history) as result:
-        print(result.all_messages()[message_count + 1 :])
-        async for message in result.stream_text():
-            print(f"\r{message}", end="", flush=True)
-    message_count = len(result.all_messages())
-    print("")
+    result = await run_agent(agent, "Who am I", history)
 
     # Print the results
     for message in result.all_messages():
