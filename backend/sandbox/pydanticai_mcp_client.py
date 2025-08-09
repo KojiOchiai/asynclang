@@ -14,9 +14,12 @@ agent = Agent(
 
 
 async def main():
+    message_count = 0
     async with agent.run_stream("I am Alice. What time is it?") as result:
+        print(result.all_messages()[message_count + 1 :])
         async for message in result.stream_text():
             print(f"\r{message}", end="", flush=True)
+    message_count = len(result.all_messages())
     print("")
 
     # Save the message history to a file
@@ -29,8 +32,10 @@ async def main():
 
     # Run the agent with the loaded message history
     async with agent.run_stream("Who am I", message_history=history) as result:
+        print(result.all_messages()[message_count + 1 :])
         async for message in result.stream_text():
             print(f"\r{message}", end="", flush=True)
+    message_count = len(result.all_messages())
     print("")
 
     # Print the results
@@ -39,6 +44,8 @@ async def main():
         for part in message.parts:
             if hasattr(part, "content"):
                 print(f"{part.part_kind}: {part.content}")
+            if part.part_kind == "tool-call":
+                print(f"{part.part_kind}: {part.tool_name}: {part.args}")
 
 
 if __name__ == "__main__":
