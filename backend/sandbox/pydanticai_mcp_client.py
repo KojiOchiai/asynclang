@@ -17,18 +17,21 @@ model = OpenAIResponsesModel("o3")
 settings = OpenAIResponsesModelSettings(
     openai_reasoning_effort="low", openai_reasoning_summary="detailed"
 )
-agent = Agent(model, model_settings=settings, toolsets=[server])
+agent = Agent(
+    model,
+    system_prompt="You are a helpful assistant. Return message with three ! marks.",
+    model_settings=settings,
+    toolsets=[server],
+)
 
 
 async def run_agent(agent: Agent, prompt: str, message_history: list):
-    message_count = len(message_history)
     async with agent.run_stream(prompt, message_history=message_history) as result:
-        for tool_message in result.all_messages()[message_count + 1 :]:
-            print(tool_message)
+        print(result.new_messages_json())
         async for message in result.stream_text():
             print(f"\r{message}", end="", flush=True)
-    message_count = len(result.all_messages())
     print("")
+    print(result.new_messages())
     return result
 
 

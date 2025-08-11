@@ -2,8 +2,14 @@
   {
     "parts": [
       {
+        "content": "You are a helpful assistant. Return message with three ! marks.",
+        "timestamp": "2025-08-11T12:22:47.949568Z",
+        "dynamic_ref": null,
+        "part_kind": "system-prompt"
+      },
+      {
         "content": "I am Alice. What time is it?",
-        "timestamp": "2025-08-09T06:50:43.680930Z",
+        "timestamp": "2025-08-11T12:22:47.949571Z",
         "part_kind": "user-prompt"
       }
     ],
@@ -15,28 +21,28 @@
       {
         "content": "",
         "id": null,
-        "signature": "rs_6896efc5f5b481948312e765e6db9a220f2b845494bcc313",
+        "signature": "rs_6899e0999eb08195a0cc99111e4a0e000b0b66fe938e69a0",
         "part_kind": "thinking"
       },
       {
         "tool_name": "get_time",
         "args": "{}",
-        "tool_call_id": "call_1vqIQT9CPTWl0hy7c0bmiRSw",
+        "tool_call_id": "call_bbNf7VxY2mzkHlNSxpgh9Lo8",
         "part_kind": "tool-call"
       }
     ],
     "usage": {
       "requests": 0,
-      "request_tokens": 41,
+      "request_tokens": 58,
       "response_tokens": 16,
-      "total_tokens": 57,
+      "total_tokens": 74,
       "details": {
         "reasoning_tokens": 0,
         "cached_tokens": 0
       }
     },
     "model_name": "o3",
-    "timestamp": "2025-08-09T06:50:45Z",
+    "timestamp": "2025-08-11T12:22:49Z",
     "kind": "response",
     "vendor_details": null,
     "vendor_id": null
@@ -45,10 +51,10 @@
     "parts": [
       {
         "tool_name": "get_time",
-        "content": "2025-08-09 15:50:47",
-        "tool_call_id": "call_1vqIQT9CPTWl0hy7c0bmiRSw",
+        "content": "2025-08-11 21:22:53",
+        "tool_call_id": "call_bbNf7VxY2mzkHlNSxpgh9Lo8",
         "metadata": null,
-        "timestamp": "2025-08-09T06:50:47.021356Z",
+        "timestamp": "2025-08-11T12:22:53.539924Z",
         "part_kind": "tool-return"
       }
     ],
@@ -58,22 +64,22 @@
   {
     "parts": [
       {
-        "content": "Hello Alice! It’s currently 2025-08-09 15:50:47 (UTC).",
+        "content": "It’s 2025-08-11 21:22:53!!!",
         "part_kind": "text"
       }
     ],
     "usage": {
       "requests": 0,
-      "request_tokens": 75,
-      "response_tokens": 26,
-      "total_tokens": 101,
+      "request_tokens": 92,
+      "response_tokens": 20,
+      "total_tokens": 112,
       "details": {
         "reasoning_tokens": 0,
         "cached_tokens": 0
       }
     },
     "model_name": "o3",
-    "timestamp": "2025-08-09T06:50:47Z",
+    "timestamp": "2025-08-11T12:22:53Z",
     "kind": "response",
     "vendor_details": null,
     "vendor_id": null
