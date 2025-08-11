@@ -1,0 +1,74 @@
+from typing import Annotated
+from uuid import UUID
+
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.api.agent import agent
+from app.api.dtos import ThreadDto
+from app.db.crud import ThreadCRUD
+from app.db.database import get_async_session
+
+router = APIRouter(prefix="/threads", tags=["threads"])
+
+
+async def get_thread_crud(
+    session: Annotated[AsyncSession, Depends(get_async_session)],
+) -> ThreadCRUD:
+    return ThreadCRUD(session)
+
+
+@router.post("/", response_model=ThreadDto)
+async def create_thread(
+    title: str,
+    service: Annotated[ThreadCRUD, Depends(get_thread_crud)],
+):
+    thread = await service.create_thread(title)
+    return ThreadDto.from_model(thread)
+
+
+@router.get("/", response_model=list[ThreadDto])
+async def get_all_threads(
+    service: Annotated[ThreadCRUD, Depends(get_thread_crud)],
+):
+    threads = await service.get_all_threads()
+    return [ThreadDto.from_model(thread) for thread in threads]
+
+
+@router.get("/{thread_id}", response_model=ThreadDto)
+async def get_thread_by_id(
+    thread_id: UUID,
+    service: Annotated[ThreadCRUD, Depends(get_thread_crud)],
+):
+    thread = await service.get_thread_by_id(thread_id)
+    if thread is None:
+        raise HTTPException(status_code=404, detail="Thread not found")
+    return ThreadDto.from_model(thread)
+
+
+@router.delete("/{thread_id}")
+async def delete_thread(
+    thread_id: UUID,
+    service: Annotated[ThreadCRUD, Depends(get_thread_crud)],
+):
+    success = await service.delete_thread(thread_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Thread not found")
+    return {"message": "Thread deleted successfully"}
+
+
+@router.post("/{thread_id}/messages")
+async def create_message(
+    thread_id: UUID,
+    user_prompt: str,
+    service: Annotated[ThreadCRUD, Depends(get_thread_crud)],
+):
+    try:
+        thread = await service.get_thread_by_id(thread_id)
+        if thread is None:
+            raise ValueError("Thread not found")
+        result = await agent.run(user_prompt, message_history=thread.messages)
+        await service.add_messages_to_thread(thread_id, result.new_messages())
+        return result.output
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
