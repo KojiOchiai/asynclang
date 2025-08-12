@@ -31,16 +31,18 @@ class MessageDto(BaseModel):
             role = MessageRole.SYSTEM
         elif part.part_kind == "user-prompt":
             role = MessageRole.USER
+        elif part.part_kind == "tool-return":
+            role = MessageRole.USER
         else:
             role = MessageRole.ASSISTANT
 
         content = None
-        if hasattr(part, "content") and part.content is not None:
-            content = str(part.content)
-        elif part.part_kind == "tool-call":
+        if part.part_kind == "tool-call":
             content = f"Tool call: {part.tool_name} with args {part.args}"
         elif part.part_kind == "tool-return":
             content = f"Tool return: {part.content}"
+        elif hasattr(part, "content") and part.content is not None:
+            content = str(part.content)
 
         return cls(
             role=role,
