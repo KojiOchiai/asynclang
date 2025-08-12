@@ -22,9 +22,13 @@ class MessageModel(Base):
     __tablename__ = "messages"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
-    thread_id: Mapped[str] = mapped_column(String(36), ForeignKey("threads.id"), nullable=False)
+    thread_id: Mapped[str] = mapped_column(
+        String(36), ForeignKey("threads.id"), nullable=False
+    )
     content: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
 
     # Relationship to ThreadModel
-    thread: Mapped["ThreadModel"] = relationship("ThreadModel", back_populates="messages")
+    thread: Mapped["ThreadModel"] = relationship(
+        "ThreadModel", back_populates="messages"
+    )
