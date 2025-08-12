@@ -15,6 +15,9 @@ class MessageRole(str, Enum):
     SYSTEM = "system"
     USER = "user"
     ASSISTANT = "assistant"
+    TOOLCALL = "tool-call"
+    TOOLRETURN = "tool-return"
+    RETRY = "retry"
 
 
 class MessageDto(BaseModel):
@@ -31,16 +34,20 @@ class MessageDto(BaseModel):
             role = MessageRole.SYSTEM
         elif part.part_kind == "user-prompt":
             role = MessageRole.USER
+        elif part.part_kind == "tool-call":
+            role = MessageRole.TOOLCALL
         elif part.part_kind == "tool-return":
-            role = MessageRole.USER
-        else:
+            role = MessageRole.TOOLRETURN
+        elif part.part_kind == "text":
             role = MessageRole.ASSISTANT
+        elif part.part_kind == "retry-prompt":
+            role = MessageRole.RETRY
 
         content = None
         if part.part_kind == "tool-call":
             content = f"Tool call: {part.tool_name} with args {part.args}"
         elif part.part_kind == "tool-return":
-            content = f"Tool return: {part.content}"
+            content = f"{part.tool_name}: {part.content}"
         elif hasattr(part, "content") and part.content is not None:
             content = str(part.content)
 
