@@ -2,7 +2,7 @@ from datetime import datetime
 
 from mcp.server.fastmcp import FastMCP
 
-mcp = FastMCP("whattime")
+mcp = FastMCP("whattime", port=8001)
 
 
 @mcp.tool()

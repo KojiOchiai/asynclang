@@ -86,7 +86,9 @@ class ThreadCRUD:
         self, thread_id: UUID, messages: list[ModelMessage]
     ) -> Thread:
         result = await self._session.execute(
-            select(ThreadModel).where(ThreadModel.id == str(thread_id))
+            select(ThreadModel)
+            .options(selectinload(ThreadModel.messages))
+            .where(ThreadModel.id == str(thread_id))
         )
         thread_model = result.scalar_one_or_none()
 

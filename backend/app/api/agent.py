@@ -4,7 +4,7 @@ from pydantic_ai.models.openai import OpenAIResponsesModel, OpenAIResponsesModel
 
 from app.config.config import settings
 
-server = MCPServerStreamableHTTP("http://localhost:8000/mcp")
+server = MCPServerStreamableHTTP("http://localhost:8001/mcp")
 
 if settings.openai_model == "gpt-4o":
     agent = Agent(
