@@ -15,6 +15,7 @@ class MessageRole(str, Enum):
     SYSTEM = "system"
     USER = "user"
     ASSISTANT = "assistant"
+    THINKING = "thinking"
     TOOLCALL = "tool-call"
     TOOLRETURN = "tool-return"
     RETRY = "retry"
@@ -34,12 +35,14 @@ class MessageDto(BaseModel):
             role = MessageRole.SYSTEM
         elif part.part_kind == "user-prompt":
             role = MessageRole.USER
+        elif part.part_kind == "text":
+            role = MessageRole.ASSISTANT
+        elif part.part_kind == "thinking":
+            role = MessageRole.THINKING
         elif part.part_kind == "tool-call":
             role = MessageRole.TOOLCALL
         elif part.part_kind == "tool-return":
             role = MessageRole.TOOLRETURN
-        elif part.part_kind == "text":
-            role = MessageRole.ASSISTANT
         elif part.part_kind == "retry-prompt":
             role = MessageRole.RETRY
 
