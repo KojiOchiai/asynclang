@@ -2,6 +2,7 @@ from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
+from pydantic import Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.agent import agent
@@ -20,7 +21,7 @@ async def get_thread_crud(
 
 @router.post("/", response_model=ThreadDto)
 async def create_thread(
-    title: str,
+    title: Annotated[str, Field(min_length=1, max_length=100)],
     service: Annotated[ThreadCRUD, Depends(get_thread_crud)],
 ):
     thread = await service.create_thread(title)
