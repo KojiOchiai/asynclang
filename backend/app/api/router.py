@@ -1,7 +1,7 @@
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.agent import agent
@@ -57,18 +57,34 @@ async def delete_thread(
     return {"message": "Thread deleted successfully"}
 
 
+async def run_agent_with_thread(
+    thread_id: UUID,
+    user_prompt: str,
+    service: ThreadCRUD,
+):
+    thread = await service.get_thread_by_id(thread_id)
+    if thread is None:
+        raise ValueError("Thread not found")
+
+    result = await agent.run(user_prompt, message_history=thread.messages)
+    await service.add_messages_to_thread(thread_id, result.new_messages())
+    return result.output
+
+
 @router.post("/{thread_id}/messages")
 async def create_message(
     thread_id: UUID,
     user_prompt: str,
     service: Annotated[ThreadCRUD, Depends(get_thread_crud)],
+    background_tasks: BackgroundTasks,
+    fire_and_forget: bool = False,
 ):
     try:
-        thread = await service.get_thread_by_id(thread_id)
-        if thread is None:
-            raise ValueError("Thread not found")
-        result = await agent.run(user_prompt, message_history=thread.messages)
-        await service.add_messages_to_thread(thread_id, result.new_messages())
-        return result.output
+        if fire_and_forget:
+            background_tasks.add_task(
+                run_agent_with_thread, thread_id, user_prompt, service
+            )
+            return {"message": "Request is being processed in the background"}
+        return await run_agent_with_thread(thread_id, user_prompt, service)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
