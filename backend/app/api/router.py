@@ -5,7 +5,7 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from pydantic import Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.agent import agent
+from app.api.agent import Agent, initialize_agent
 from app.api.dtos import ThreadDto
 from app.db.crud import ThreadCRUD
 from app.db.database import get_async_session
@@ -59,6 +59,7 @@ async def delete_thread(
 
 
 async def run_agent_with_thread(
+    agent: Agent,
     thread_id: UUID,
     user_prompt: str,
     service: ThreadCRUD,
@@ -81,11 +82,12 @@ async def create_message(
     fire_and_forget: bool = False,
 ):
     try:
+        agent = await initialize_agent(thread_id)
         if fire_and_forget:
             background_tasks.add_task(
-                run_agent_with_thread, thread_id, user_prompt, service
+                run_agent_with_thread, agent, thread_id, user_prompt, service
             )
             return {"message": "Request is being processed in the background"}
-        return await run_agent_with_thread(thread_id, user_prompt, service)
+        return await run_agent_with_thread(agent, thread_id, user_prompt, service)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))

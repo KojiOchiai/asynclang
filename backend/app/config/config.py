@@ -5,6 +5,10 @@ from pydantic_settings import BaseSettings
 
 logger = logging.getLogger(__name__)
 
+logger.setLevel(logging.INFO)
+handler = logging.StreamHandler()
+logger.addHandler(handler)
+
 
 class Settings(BaseSettings):
     """Application settings using pydantic-settings."""
