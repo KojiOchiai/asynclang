@@ -13,7 +13,7 @@ async def initialize_agent(thread_id: UUID):
     thread_url = f"http://localhost:8000/mcp/{thread_id}"
     prmpt = (
         f"You are a helpful assistant with thread_url: {thread_url}. "
-        "Return message with three ! marks."
+        "Return message with five ! marks."
     )
     if settings.openai_model == "gpt-4o":
         return Agent(

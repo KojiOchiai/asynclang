@@ -9,6 +9,7 @@ from app.api.agent import Agent, initialize_agent
 from app.api.dtos import ThreadDto
 from app.db.crud import ThreadCRUD
 from app.db.database import get_async_session
+from app.entities.thread import Thread
 
 router = APIRouter(prefix="/threads", tags=["threads"])
 
@@ -62,11 +63,17 @@ async def run_agent_with_thread(
     agent: Agent,
     thread_id: UUID,
     user_prompt: str,
+    thread: Thread,
     service: ThreadCRUD,
 ):
-    thread = await service.get_thread_by_id(thread_id)
-    if thread is None:
-        raise ValueError("Thread not found")
+    # overwrite system prompt
+    system_prompt = agent._system_prompts[0]
+    for message in thread.messages:
+        if message.kind == "request":
+            for part in message.parts:
+                if part.part_kind == "system-prompt":
+                    part.content = system_prompt
+                    break
 
     result = await agent.run(user_prompt, message_history=thread.messages)
     await service.add_messages_to_thread(thread_id, result.new_messages())
@@ -79,15 +86,37 @@ async def create_message(
     user_prompt: str,
     service: Annotated[ThreadCRUD, Depends(get_thread_crud)],
     background_tasks: BackgroundTasks,
-    fire_and_forget: bool = False,
 ):
+    thread = await service.get_thread_by_id(thread_id)
+    if thread is None:
+        raise HTTPException(status_code=404, detail="Thread not found")
     try:
         agent = await initialize_agent(thread_id)
-        if fire_and_forget:
-            background_tasks.add_task(
-                run_agent_with_thread, agent, thread_id, user_prompt, service
-            )
-            return {"message": "Request is being processed in the background"}
-        return await run_agent_with_thread(agent, thread_id, user_prompt, service)
+        background_tasks.add_task(
+            run_agent_with_thread, agent, thread_id, user_prompt, thread, service
+        )
+        return {"message": "Request is being processed in the background"}
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.post("webhook/mcp")
+async def webhook_handler(
+    thread_id: UUID,
+    mcp_name: str,
+    content: str,
+    service: Annotated[ThreadCRUD, Depends(get_thread_crud)],
+    background_tasks: BackgroundTasks,
+):
+    thread = await service.get_thread_by_id(thread_id)
+    if thread is None:
+        raise HTTPException(status_code=404, detail="Thread not found")
+    try:
+        agent = await initialize_agent(thread_id)
+        prompt_json = f"{{'mcp_name': '{mcp_name}', 'content': '{content}'}}"
+        background_tasks.add_task(
+            run_agent_with_thread, agent, thread_id, prompt_json, thread, service
+        )
+        return {"message": "Request is being processed in the background"}
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
