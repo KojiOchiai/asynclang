@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "whattime": {
+      "command": "uv",
+      "args": ["run", "whattime.py"]
+    },
+    "notifier": {
+      "command": "uv",
+      "args": ["run", "notifier.py"]
+    }
+  }
+}
